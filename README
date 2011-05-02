@@ -1,0 +1,6 @@
+Soundcloud plugin for Mielophone repository.
+Basic class for searching mp3 URLs
+
+Depends on: 
+1. libcodezen - https://github.com/yamalight/libcodezen 
+2. Soundcloud-AS3-API - https://github.com/dorianroy/Soundcloud-AS3-API
