@@ -1,6 +1,8 @@
 package
 {
 	import com.codezen.helper.WebWorker;
+	import com.codezen.music.playr.Playr;
+	import com.codezen.music.playr.PlayrTrack;
 	import com.codezen.music.search.ISearchProvider;
 	import com.dasflash.soundcloud.as3api.SoundcloudClient;
 	import com.dasflash.soundcloud.as3api.SoundcloudDelegate;
@@ -14,7 +16,7 @@ package
 	public class Searcher extends WebWorker implements ISearchProvider
 	{
 		// results array
-		private var _result:Array;
+		private var _result:Vector.<PlayrTrack>;
 		
 		// sound cloud stuff
 		private var sc:SoundcloudClient;
@@ -41,7 +43,7 @@ package
 			trace("request token received: "+event.token.key+", "+event.token.secret);
 		}
 		
-		public function get result():Array{
+		public function get result():Vector.<PlayrTrack>{
 			return _result;
 		}
 		
@@ -69,13 +71,15 @@ package
 				return;
 			}
 			
-			_result = [];
+			_result = new Vector.<PlayrTrack>();
 			
 			var item:XML;
-			var obj:Object;
+			var obj:PlayrTrack;
+			
 			var sec:int;
 			var min:int;
 			var time:String;
+			
 			for each(item in tracks){
 				sec = int( item.duration.text() / 1000 );
 				min = sec/60;
@@ -87,15 +91,12 @@ package
 					time += sec;
 				}
 				
-				obj = {
-					title:item.title.text(),
-						url:item["stream-url"].text(),
-						playreq: sc.getSignedURLRequest(item["stream-url"].text()),
-						dur:int( item.duration.text() / 1000 ),
-						time:time,
-						dur_link:0,
-						active:true
-				};
+				obj = new PlayrTrack();
+				obj.title = item.title.text();
+				obj.file = item["stream-url"].text();
+				obj.request = sc.getSignedURLRequest(item["stream-url"].text());
+				obj.totalSeconds = int( item.duration.text() / 1000 );
+				obj.totalTime = time;
 				
 				_result.push(obj);
 			}
