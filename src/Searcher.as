@@ -30,6 +30,17 @@ package
 			initSoundcloud();
 		}
 		
+		public function get PLUGIN_NAME():String{
+			return "Soundcloud MP3 Search";
+		}
+		
+		public function get AUTHOR_NAME():String{
+			return "yamalight";
+		}
+		
+		public function get result():Vector.<PlayrTrack>{
+			return _result;
+		}
 		
 		private function initSoundcloud():void{
 			trace('initing soundcloud');
@@ -43,13 +54,13 @@ package
 			trace("request token received: "+event.token.key+", "+event.token.secret);
 		}
 		
-		public function get result():Vector.<PlayrTrack>{
-			return _result;
-		}
-		
-		public function search(query:String):void{			
+		public function search(query:String, durationMs:int = 0):void{			
 			var params:Object = {};
-			params.filter = "streamable";
+			params.filter = "streamable,downloadable";
+			if( durationMs > 0 ){
+				params["duration[from]"] = durationMs - 1000;
+				params["duration[to]"] = durationMs + 1000;
+			}
 			params.q = query;
 			
 			trace('doing single request: '+query);
@@ -81,6 +92,8 @@ package
 			var time:String;
 			
 			for each(item in tracks){
+				if(item.downloadable.text() == false){ trace('false!'); continue; }
+				
 				sec = int( item.duration.text() / 1000 );
 				min = sec/60;
 				sec -= min*60;
@@ -91,10 +104,12 @@ package
 					time += sec;
 				}
 				
+				trace(item);
+				
 				obj = new PlayrTrack();
 				obj.title = item.title.text();
-				obj.file = item["stream-url"].text();
-				obj.request = sc.getSignedURLRequest(item["stream-url"].text());
+				obj.downloadRequest = sc.getSignedURLRequest(item["download-url"].text());//item["stream-url"].text();
+				obj.streamRequest = sc.getSignedURLRequest(item["stream-url"].text());
 				obj.totalSeconds = int( item.duration.text() / 1000 );
 				obj.totalTime = time;
 				

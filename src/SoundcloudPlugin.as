@@ -21,7 +21,7 @@ package
 			//var t:Timer = new Timer(1000,1);
 			//t.addEventListener(TimerEvent.TIMER_COMPLETE, function(e:Event):void{
 				s.addEventListener(Event.COMPLETE, function(e:Event):void{
-					trace( ObjectUtil.toString( s.result ) );
+					//trace( ObjectUtil.toString( s.result ) );
 				});
 				s.search("muse take a bow");
 			//});
